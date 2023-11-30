@@ -43,5 +43,19 @@ def display_question(question_number):
 
     question = survey.questions[question_number]
 
+    #breakpoint()
+
     return render_template('question.html',
-                    question = question)
+                    question = question,
+                    question_number = question_number)
+
+
+@app.post("/answer")
+def handle_answer():
+    """ Appends answer to responses list
+        Redirects to next question
+    """
+
+    responses.append(request.form['answer'])
+
+
