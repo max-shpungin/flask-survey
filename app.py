@@ -26,10 +26,22 @@ def show_survey_instructions():
 #^ /begin route is where the form goes so we should handle that
 
 
-@app.get("/begin")
+@app.post("/begin")
 def handle_survey_start():
     """display the survey questions"""
+
+    return redirect('/questions/0')
+
 
 #need to handle the post request and turn it into a get... probably
 #it should handle URLs like /questions/0 (the first question),
 # /questions/1, and so on.
+
+
+@app.get("/questions/<int:question_number>")
+def display_question(question_number):
+
+    question = survey.questions[question_number]
+
+    return render_template('question.html',
+                    question = question)
