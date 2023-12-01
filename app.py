@@ -4,58 +4,58 @@ from surveys import satisfaction_survey as survey
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "never-tell!"
-#app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 debug = DebugToolbarExtension(app)
 
-responses = [] #todo
-
-# When the user goes to the root route,
-#     render a page that shows the user the title of the survey,
-#     the instructions, and a button to start the survey.
-
-#     The button should serve as a link that directs the user to
-#     /questions/0 (the next step will define that route).
+responses = []
 
 @app.get("/")
 def show_survey_instructions():
     """Shows the initial survey page and start button"""
 
-    return render_template("survey_start.html")
-
-#^ /begin route is where the form goes so we should handle that
+    return render_template("survey_start.html",
+                           survey = survey)
 
 
 @app.post("/begin")
 def handle_survey_start():
-    """display the survey questions"""
+    """ Display the survey questions. """
 
+    responses.clear()
     return redirect('/questions/0')
-
-
-#need to handle the post request and turn it into a get... probably
-#it should handle URLs like /questions/0 (the first question),
-# /questions/1, and so on.
 
 
 @app.get("/questions/<int:question_number>")
 def display_question(question_number):
+    """ Display a specific question in the survey. """
 
     question = survey.questions[question_number]
 
-    #breakpoint()
-
-    return render_template('question.html',
+    return render_template(
+                    'question.html',             # keep it all aligned
                     question = question,
-                    question_number = question_number)
+                    question_number = question_number
+    )
 
 
 @app.post("/answer")
 def handle_answer():
     """ Appends answer to responses list
-        Redirects to next question
-    """
+        Redirects to next question. """
 
     responses.append(request.form['answer'])
+    question_number = int(request.form['question_number'])
+    question_number += 1
+    if question_number == len(survey.questions):
+        return redirect('/ok-thanks')
+    return redirect(f'/questions/{question_number}')
 
+@app.get("/ok-thanks")
+def thank_the_user():
+    """ Thank the user for their valuable participation in our
+        survey."""
 
+    return render_template('completion.html',
+                           responses = responses,
+                           questions = survey.questions)
