@@ -46,9 +46,11 @@ def handle_answer():
 
     responses.append(request.form['answer'])
     question_number = int(request.form['question_number'])
-    question_number += 1
+    question_number += 1     # instead of this q_n thing, use len(responses)
+
     if question_number == len(survey.questions):
         return redirect('/ok-thanks')
+
     return redirect(f'/questions/{question_number}')
 
 @app.get("/ok-thanks")
@@ -59,3 +61,8 @@ def thank_the_user():
     return render_template('completion.html',
                            responses = responses,
                            questions = survey.questions)
+
+
+# What if they just manually type in questions/2 ? Needs an error.
+# What if, what if?
+# jinja 8M+ dl's wholroyd for syntax highlighting? TODO: look into this.

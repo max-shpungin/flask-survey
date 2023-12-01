@@ -6,7 +6,7 @@
   <p> Your responses have been recorded as: </p>
   <ol>
     {% for question in questions %}
-    <li> {{ question.prompt }}: {{ responses[loop.index - 1] }} </li>
+    <li> {{ question.prompt }}: {{ responses[loop.index0] }} </li>
     {% endfor %}
   </ol>
 
