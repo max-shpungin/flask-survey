@@ -8,7 +8,7 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 debug = DebugToolbarExtension(app)
 
-responses = []
+#responses = []
 
 @app.get("/")
 def show_survey_instructions():
@@ -22,7 +22,8 @@ def show_survey_instructions():
 def handle_survey_start():
     """ Display the survey questions. """
 
-    responses.clear()
+    #responses.clear()
+
     return redirect('/questions/0')
 
 
@@ -31,9 +32,9 @@ def display_question(question_number):
     """ Display a specific question in the survey. """
 
     question = survey.questions[question_number]
-
+    session['responses'] = session.get('responses', []) #if session. else []
     return render_template(
-                    'question.html',             # keep it all aligned
+                    'question.html',
                     question = question,
                     question_number = question_number
     )
@@ -44,11 +45,19 @@ def handle_answer():
     """ Appends answer to responses list
         Redirects to next question. """
 
-    responses.append(request.form['answer'])
-    question_number = int(request.form['question_number'])
-    question_number += 1     # instead of this q_n thing, use len(responses)
+    # responses.append(request.form['answer'])
 
-    if question_number == len(survey.questions):
+    responses = session['responses'] #if session['responses'] else []
+   # breakpoint()
+
+    responses.append(request.form['answer'])
+    session['responses'] = responses
+
+   # breakpoint()
+
+    question_number = len(responses)
+
+    if len(survey.questions) == question_number:
         return redirect('/ok-thanks')
 
     return redirect(f'/questions/{question_number}')
@@ -57,6 +66,8 @@ def handle_answer():
 def thank_the_user():
     """ Thank the user for their valuable participation in our
         survey."""
+
+    responses = session['responses']
 
     return render_template('completion.html',
                            responses = responses,
