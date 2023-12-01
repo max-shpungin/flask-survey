@@ -10,6 +10,16 @@ debug = DebugToolbarExtension(app)
 
 #responses = []
 
+
+# new_responses = {
+#     0: None,
+#     1: None,
+#     2: None
+# }
+
+
+
+
 @app.get("/")
 def show_survey_instructions():
     """Shows the initial survey page and start button"""
@@ -32,7 +42,8 @@ def display_question(question_number):
     """ Display a specific question in the survey. """
 
     question = survey.questions[question_number]
-    session['responses'] = session.get('responses', []) #if session. else []
+    # session['responses'] = session.get('responses', [])
+    session['response_dict'] = session.get('response_dict', {})
     return render_template(
                     'question.html',
                     question = question,
@@ -47,20 +58,27 @@ def handle_answer():
 
     # responses.append(request.form['answer'])
 
-    responses = session['responses'] #if session['responses'] else []
-   # breakpoint()
+    question_number = int(request.form['question_number'])
+    next_question_number = question_number + 1
 
-    responses.append(request.form['answer'])
-    session['responses'] = responses
+    # responses = session['responses'] #if session['responses'] else []
+    response_dict = session['response_dict'] #if session['responses'] else []
+    breakpoint()
 
-   # breakpoint()
+    # responses.append(request.form['answer'])
+    response_dict[question_number] = request.form['answer']
 
-    question_number = len(responses)
+
+    # session['responses'] = responses
+    session['response_dict'] = response_dict
+    breakpoint()
+
+    # question_number = len(responses)
 
     if len(survey.questions) == question_number:
         return redirect('/ok-thanks')
 
-    return redirect(f'/questions/{question_number}')
+    return redirect(f'/questions/{next_question_number}')
 
 @app.get("/ok-thanks")
 def thank_the_user():
